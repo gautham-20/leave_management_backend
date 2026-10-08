@@ -1,0 +1,14 @@
+# local env files — never commit real secrets
+.env
+.env*.local
+
+# java / maven
+/target/
+*.class
+.idea/
+*.iml
+.vscode/
+
+# misc
+.DS_Store
+*.pem
