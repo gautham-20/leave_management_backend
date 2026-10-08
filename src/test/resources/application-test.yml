@@ -1,0 +1,42 @@
+# Test profile: H2 in PostgreSQL compatibility mode so the Flyway migrations,
+# which are written for Postgres, run without a live database.
+#
+# The MySQL migration scripts are NOT exercised here — running them requires a
+# real MySQL server. If you change db/migration/mysql/*, verify it against a
+# live MySQL instance rather than trusting this suite.
+spring:
+  datasource:
+    url: jdbc:h2:mem:leavems;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+    # {vendor} would resolve to "h2", which has no migration folder. The
+    # PostgreSQL scripts run unchanged under H2's PostgreSQL compatibility mode
+    # (hence TIMESTAMP WITH TIME ZONE and WHERE NOT EXISTS instead of ON
+    # CONFLICT), so they are reused here.
+    locations: classpath:db/migration/postgresql
+
+app:
+  jwt:
+    # Comfortably over the 32-byte minimum HS256 requirement.
+    secret: test-secret-key-for-integration-tests-only-0123456789
+    ttl-hours: 1
+  cors:
+    allowed-origins: http://localhost:3000
+
+logging:
+  level:
+    org.hibernate.SQL: WARN
+    org.flywaydb: INFO

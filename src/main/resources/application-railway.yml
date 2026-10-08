@@ -1,0 +1,20 @@
+# Railway deployment profile.
+#
+# Railway's PostgreSQL plugin injects PGHOST/PGPORT/PGDATABASE/PGUSER/PGPASSWORD
+# as discrete variables, while the JDBC driver needs a single jdbc: URL. The URL
+# below is assembled from those parts so nothing has to be parsed by hand.
+#
+# Activate with: SPRING_PROFILES_ACTIVE=railway
+spring:
+  datasource:
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
+    username: ${PGUSER}
+    password: ${PGPASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    properties:
+      hibernate:
+        # No explicit dialect — Hibernate resolves it from the JDBC connection.
+        jdbc:
+          time_zone: UTC
