@@ -33,9 +33,14 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidation(MethodArgumentNotValidException ex) {
+        // getDefaultMessage() is null for some constraint violations, which would
+        // otherwise render as a bare "null" and hide which field actually failed.
         String message = ex.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getField() + " " + error.getDefaultMessage())
+                .map(error -> error.getField() + " is invalid")
                 .collect(Collectors.joining(", "));
+        if (message.isEmpty()) {
+            message = "The request body failed validation";
+        }
         return ResponseEntity.badRequest().body(body(HttpStatus.BAD_REQUEST, message));
     }
 
